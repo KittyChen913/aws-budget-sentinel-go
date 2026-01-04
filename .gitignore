@@ -8,6 +8,10 @@
 *.so
 *.dylib
 
+# Lambda deployment files
+bootstrap
+*.zip
+
 # Test binary, built with `go test -c`
 *.test
 
