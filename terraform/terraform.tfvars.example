@@ -1,0 +1,42 @@
+# Example terraform.tfvars file
+# 複製此檔案為 terraform.tfvars 並根據需求修改
+
+# AWS 區域
+aws_region = "us-east-1"
+
+# AWS CLI Profile（如果有配置多個 profile）
+aws_profile = "admin"
+
+# Lambda 函數名稱
+function_name = "aws-budget-sentinel"
+
+# Lambda 逾時設定（秒）
+timeout = 30
+
+# Lambda 記憶體大小（MB）
+memory_size = 128
+
+# Discord Webhook URL（選填）
+# discord_webhook_url = "https://discord.com/api/webhooks/..."
+
+# CloudWatch Logs 保留天數
+log_retention_days = 7
+
+# 是否啟用定期執行
+enable_schedule = true
+
+# 排程表達式（每小時執行一次）
+# 其他範例：
+# - "rate(6 hours)" - 每6小時執行一次
+# - "cron(0 * * * ? *)" - 每小時整點執行
+schedule_expression = "rate(1 hour)"
+
+# 如果在 Windows 上執行，設為 true
+is_windows = true
+
+# 標籤
+tags = {
+  Project     = "aws-budget-sentinel"
+  ManagedBy   = "Terraform"
+  Environment = "production"
+}
