@@ -12,6 +12,9 @@
 bootstrap
 *.zip
 
+# AWS Lambda test output
+output.json
+
 # Test binary, built with `go test -c`
 *.test
 
