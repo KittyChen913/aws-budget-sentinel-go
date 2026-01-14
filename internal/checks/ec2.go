@@ -9,6 +9,10 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
+func init() {
+	Register(runEC2)
+}
+
 func runEC2(ctx context.Context) ([]Result, error) {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {

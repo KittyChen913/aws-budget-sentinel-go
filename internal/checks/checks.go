@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"log"
 )
 
 // Result 檢查結果
@@ -11,15 +12,27 @@ type Result struct {
 	Data  interface{} `json:"data,omitempty"`
 }
 
-type Checker interface {
-	Run(ctx context.Context) ([]Result, error)
+// CheckFunc 定義檢查函數類型
+type CheckFunc func(ctx context.Context) ([]Result, error)
+
+// 註冊的檢查函數列表
+var registeredChecks []CheckFunc
+
+// Register 註冊一個檢查函數
+func Register(fn CheckFunc) {
+	registeredChecks = append(registeredChecks, fn)
 }
 
 func RunAll(ctx context.Context) ([]Result, error) {
 	res := []Result{}
 
-	// 檢查 EC2
-	if r, err := runEC2(ctx); err == nil {
+	// 自動執行所有已註冊的檢查
+	for _, checkFn := range registeredChecks {
+		r, err := checkFn(ctx)
+		if err != nil {
+			log.Printf("Check failed: %v", err)
+			continue
+		}
 		res = append(res, r...)
 	}
 
