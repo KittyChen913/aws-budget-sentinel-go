@@ -24,26 +24,31 @@ func handler(ctx context.Context) (Report, error) {
 	}
 
 	findings := map[string]interface{}{}
+	hasRunningServices := false
 	for _, r := range results {
 		findings[r.Name] = r.Count
+		if r.Count > 0 {
+			hasRunningServices = true
+		}
 	}
 
 	report := Report{Findings: findings}
 	_ = json.NewEncoder(log.Writer()).Encode(report)
 
-	// 傳送結果到 Discord（若有設定 webhook URL）
+	// 傳送結果到 Discord（若有設定 webhook URL && 有執行中的服務）
 	webhookURL := os.Getenv("DISCORD_WEBHOOK_URL")
-	if webhookURL != "" {
+	if webhookURL != "" && hasRunningServices {
 		log.Println("Sending results to Discord...")
 		msg := discord.FormatCheckResults(findings)
 		if err := discord.SendWebhook(ctx, webhookURL, msg); err != nil {
 			log.Printf("Failed to send Discord webhook: %v", err)
-			// 不中斷執行，繼續回傳結果
 		} else {
 			log.Println("Successfully sent to Discord")
 		}
-	} else {
+	} else if webhookURL == "" {
 		log.Println("DISCORD_WEBHOOK_URL not set, skipping Discord notification")
+	} else {
+		log.Println("No running services found, skipping Discord notification")
 	}
 
 	return report, nil
