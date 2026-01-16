@@ -36,7 +36,8 @@ resource "aws_iam_role_policy" "lambda_ec2_read" {
         Effect = "Allow"
         Action = [
           "ec2:DescribeInstances",
-          "ec2:DescribeInstanceStatus"
+          "ec2:DescribeInstanceStatus",
+          "ec2:DescribeNatGateways"
         ]
         Resource = "*"
       }
