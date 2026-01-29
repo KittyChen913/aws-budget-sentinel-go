@@ -1,0 +1,41 @@
+name: Build and Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GOOS: linux
+  GOARCH: amd64
+  CGO_ENABLED: 0
+  FUNCTION_NAME: budget-sentinel
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.1'
+          
+      - name: Build Lambda function
+        run: |
+          go build -ldflags="-s -w" -o bootstrap ./cmd/lambda
+          
+      - name: Create deployment package
+        run: |
+          zip lambda-deployment.zip bootstrap
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: lambda-deployment
+          path: lambda-deployment.zip
