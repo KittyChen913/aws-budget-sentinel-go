@@ -39,3 +39,61 @@ jobs:
         with:
           name: lambda-deployment
           path: lambda-deployment.zip
+          
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-deployment
+          
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+          
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+          
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+        
+      - name: Terraform Plan
+        working-directory: ./terraform
+        run: terraform plan -out=tfplan
+        
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve tfplan
+        
+      - name: Update Lambda function code
+        run: |
+          aws lambda update-function-code \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --zip-file fileb://lambda-deployment.zip
+            
+      - name: Wait for Lambda update
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ env.FUNCTION_NAME }}
+            
+      - name: Deploy complete
+        run: |
+          echo "Lambda function ${{ env.FUNCTION_NAME }} deployed successfully!"
+          aws lambda get-function \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --query 'Configuration.[FunctionName,CodeSha256,LastModified]' \
+            --output table
