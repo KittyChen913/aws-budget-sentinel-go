@@ -4,8 +4,8 @@
 # AWS 區域
 aws_region = "us-east-1"
 
-# AWS CLI Profile（如果有配置多個 profile）
-aws_profile = "admin"
+# AWS CLI Profile（如果有配置多個 profile；使用 GitHub Actions/OIDC 的話請留空或移除）
+# aws_profile = "admin"
 
 # Lambda 函數名稱
 function_name = "aws-budget-sentinel"

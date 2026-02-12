@@ -5,9 +5,10 @@ variable "aws_region" {
 }
 
 variable "aws_profile" {
-  description = "AWS CLI profile to use"
+  description = "AWS CLI profile to use (leave null to use environment credentials, e.g. GitHub Actions)"
   type        = string
-  default     = "admin"
+  nullable    = true
+  default     = null
 }
 
 variable "function_name" {
