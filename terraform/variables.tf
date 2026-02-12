@@ -54,12 +54,6 @@ variable "schedule_expression" {
   default     = "rate(1 hour)"
 }
 
-variable "is_windows" {
-  description = "Set to true if running on Windows"
-  type        = bool
-  default     = true
-}
-
 variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)

@@ -31,9 +31,6 @@ enable_schedule = true
 # - "cron(0 * * * ? *)" - 每小時整點執行
 schedule_expression = "rate(1 hour)"
 
-# 如果在 Windows 上執行，設為 true
-is_windows = true
-
 # 標籤
 tags = {
   Project     = "aws-budget-sentinel"

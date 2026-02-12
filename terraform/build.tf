@@ -10,7 +10,7 @@ resource "null_resource" "build_lambda" {
   }
 
   provisioner "local-exec" {
-    command     = var.is_windows ? "powershell -File ${path.module}/build.ps1" : "bash ${path.module}/build.sh"
+    command     = "bash ${path.module}/build.sh"
     working_dir = path.module
   }
 }
