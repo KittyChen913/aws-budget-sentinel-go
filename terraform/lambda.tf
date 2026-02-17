@@ -7,12 +7,13 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 }
 
 # Lambda 函數
+# 注意：lambda-deployment.zip 由 CI/CD Build Job 編譯打包並下載到 ./lambda-artifact
 resource "aws_lambda_function" "budget_sentinel" {
-  filename         = data.archive_file.lambda_zip.output_path
+  filename         = "${path.module}/../lambda-artifact/lambda-deployment.zip"
   function_name    = var.function_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "bootstrap"
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash = filebase64sha256("${path.module}/../lambda-artifact/lambda-deployment.zip")
   runtime          = "provided.al2023"
   architectures    = ["x86_64"]
   timeout          = var.timeout

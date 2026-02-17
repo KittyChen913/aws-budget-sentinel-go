@@ -55,6 +55,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lambda-deployment
+          path: ./lambda-artifact
           
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
@@ -83,7 +84,7 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name ${{ env.FUNCTION_NAME }} \
-            --zip-file fileb://lambda-deployment.zip
+            --zip-file fileb://lambda-artifact/lambda-deployment.zip
             
       - name: Wait for Lambda update
         run: |
