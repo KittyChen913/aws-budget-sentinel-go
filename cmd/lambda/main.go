@@ -13,15 +13,13 @@ import (
 
 // 儲存彙總的檢查結果
 type Report struct {
-	Findings map[string]interface{} `json:"findings"`
+	Findings    map[string]interface{} `json:"findings"`
+	CheckErrors map[string]string      `json:"check_errors,omitempty"`
 }
 
 func handler(ctx context.Context) (Report, error) {
 	log.Println("Starting aws-budget-sentinel checks")
-	results, err := checks.RunAll(ctx)
-	if err != nil {
-		log.Println("checks error:", err)
-	}
+	results, checkErrors := checks.RunAllChecksWithErrors(ctx)
 
 	findings := map[string]interface{}{}
 	hasRunningServices := false
@@ -32,7 +30,10 @@ func handler(ctx context.Context) (Report, error) {
 		}
 	}
 
-	report := Report{Findings: findings}
+	report := Report{
+		Findings:    findings,
+		CheckErrors: checkErrors,
+	}
 	_ = json.NewEncoder(log.Writer()).Encode(report)
 
 	// 傳送結果到 Discord（若有設定 webhook URL && 有執行中的服務）

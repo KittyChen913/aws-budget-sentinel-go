@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"fmt"
 	"log"
 )
 
@@ -23,18 +24,22 @@ func Register(fn CheckFunc) {
 	registeredChecks = append(registeredChecks, fn)
 }
 
-func RunAll(ctx context.Context) ([]Result, error) {
+// RunAllChecksWithErrors 執行所有檢查並返回錯誤信息，用於需要診斷錯誤的場景
+func RunAllChecksWithErrors(ctx context.Context) ([]Result, map[string]string) {
 	res := []Result{}
+	errors := make(map[string]string)
 
 	// 自動執行所有已註冊的檢查
-	for _, checkFn := range registeredChecks {
+	for i, checkFn := range registeredChecks {
 		r, err := checkFn(ctx)
 		if err != nil {
-			log.Printf("Check failed: %v", err)
+			checkID := fmt.Sprintf("check_%d", i)
+			errors[checkID] = err.Error()
+			log.Printf("[%s] failed: %v", checkID, err)
 			continue
 		}
 		res = append(res, r...)
 	}
 
-	return res, nil
+	return res, errors
 }
