@@ -127,9 +127,21 @@ jobs:
       - name: Verify Lambda response
         run: |
           STATUS_CODE=$(jq -r '.StatusCode' invoke_metadata.json)
-          if [ "$STATUS_CODE" = "200" ]; then
-            echo "✓ Lambda function executed successfully"
-          else
+          CHECK_ERRORS=$(jq -r '.check_errors // empty' lambda_response.json)
+          
+          echo "Status Code: $STATUS_CODE"
+          echo "Check Errors: $CHECK_ERRORS"
+          
+          if [ "$STATUS_CODE" != "200" ]; then
             echo "✗ Lambda function failed with status code: $STATUS_CODE"
             exit 1
           fi
+          
+          if [ -n "$CHECK_ERRORS" ] && [ "$CHECK_ERRORS" != "{}" ]; then
+            echo "⚠ Lambda executed but some checks failed:"
+            jq '.check_errors' lambda_response.json
+            echo "Please check AWS permissions and CloudWatch logs"
+            exit 1
+          fi
+          
+          echo "✓ Lambda function executed successfully with no check errors"
