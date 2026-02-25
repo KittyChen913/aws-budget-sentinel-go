@@ -118,6 +118,11 @@ jobs:
           aws lambda invoke \
             --function-name ${{ env.FUNCTION_NAME }} \
             lambda_response.json > invoke_metadata.json 2>&1
+          echo "Invoke metadata:"
+          cat invoke_metadata.json
+          echo ""
+          echo "Lambda response:"
+          cat lambda_response.json
           
       - name: Verify Lambda response
         run: |
