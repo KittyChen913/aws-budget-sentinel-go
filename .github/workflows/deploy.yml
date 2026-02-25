@@ -117,22 +117,14 @@ jobs:
         run: |
           aws lambda invoke \
             --function-name ${{ env.FUNCTION_NAME }} \
-            --output json \
-            response.json
-          echo "Lambda invocation response:"
-          cat response.json
+            lambda_response.json > invoke_metadata.json 2>&1
           
       - name: Verify Lambda response
         run: |
-          if [ -f response.json ]; then
-            STATUS_CODE=$(jq -r '.StatusCode' response.json)
-            if [ "$STATUS_CODE" = "200" ]; then
-              echo "✓ Lambda function executed successfully (Status Code: $STATUS_CODE)"
-            else
-              echo "✗ Lambda function returned non-200 status code: $STATUS_CODE"
-              exit 1
-            fi
+          STATUS_CODE=$(jq -r '.StatusCode' invoke_metadata.json)
+          if [ "$STATUS_CODE" = "200" ]; then
+            echo "✓ Lambda function executed successfully"
           else
-            echo "✗ Failed to invoke Lambda function"
+            echo "✗ Lambda function failed with status code: $STATUS_CODE"
             exit 1
           fi
