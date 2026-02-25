@@ -38,7 +38,8 @@ resource "aws_iam_role_policy" "lambda_ec2_read" {
           "ec2:DescribeInstances",
           "ec2:DescribeInstanceStatus",
           "ec2:DescribeNatGateways",
-          "ec2:DescribeAddresses"
+          "ec2:DescribeAddresses",
+          "ec2:DescribeVpcEndpoints"
         ]
         Resource = "*"
       }
