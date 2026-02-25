@@ -98,3 +98,41 @@ jobs:
             --function-name ${{ env.FUNCTION_NAME }} \
             --query 'Configuration.[FunctionName,CodeSha256,LastModified]' \
             --output table
+            
+  test:
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      
+    steps:
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-oidc-budget-sentinel-role
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+          
+      - name: Test Lambda function
+        run: |
+          aws lambda invoke \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --output json \
+            response.json
+          echo "Lambda invocation response:"
+          cat response.json
+          
+      - name: Verify Lambda response
+        run: |
+          if [ -f response.json ]; then
+            STATUS_CODE=$(jq -r '.StatusCode' response.json)
+            if [ "$STATUS_CODE" = "200" ]; then
+              echo "✓ Lambda function executed successfully (Status Code: $STATUS_CODE)"
+            else
+              echo "✗ Lambda function returned non-200 status code: $STATUS_CODE"
+              exit 1
+            fi
+          else
+            echo "✗ Failed to invoke Lambda function"
+            exit 1
+          fi
