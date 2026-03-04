@@ -59,10 +59,10 @@ jobs:
           path: ./lambda-artifact
           
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: ./.github/actions/configure-aws
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-oidc-budget-sentinel-role
-          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+          aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
           
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -121,11 +121,11 @@ jobs:
       
     steps:
       - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: ./.github/actions/configure-aws
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-oidc-budget-sentinel-role
-          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
-          
+          aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+
       - name: Test Lambda function
         run: |
           aws lambda invoke \
