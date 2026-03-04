@@ -89,6 +89,7 @@ jobs:
             --zip-file fileb://lambda-artifact/lambda-deployment.zip
 
       - name: Get SSM Parameters
+        id: get-ssm
         uses: ./.github/actions/get-ssm-parameters
         with:
           ssm_param_path: ${{ env.SSM_PARAM_PATH }}
