@@ -11,6 +11,8 @@ env:
   CGO_ENABLED: 0
   FUNCTION_NAME: aws-budget-sentinel
   SSM_PARAM_PATH: /budget-sentinel/prod
+  GO_VERSION: '1.24.1'
+  TERRAFORM_VERSION: '1.10.0'
 
 jobs:
   build:
@@ -25,7 +27,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.24.1'
+          go-version: ${{ env.GO_VERSION }}
           
       - name: Build Lambda function
         run: |
@@ -67,7 +69,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.10.0
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
           
       - name: Terraform Init
         working-directory: ./terraform
