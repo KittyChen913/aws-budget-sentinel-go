@@ -64,7 +64,6 @@ jobs:
         uses: ./.github/actions/configure-aws
         with:
           aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
-          aws-region: ${{ vars.AWS_REGION }}
           
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -126,7 +125,6 @@ jobs:
         uses: ./.github/actions/configure-aws
         with:
           aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
-          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Test Lambda function
         run: |
