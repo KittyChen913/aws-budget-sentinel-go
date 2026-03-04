@@ -88,6 +88,11 @@ jobs:
             --function-name ${{ env.FUNCTION_NAME }} \
             --zip-file fileb://lambda-artifact/lambda-deployment.zip
 
+      - name: Wait for code update
+        run: |
+          aws lambda wait function-updated \
+            --function-name ${{ env.FUNCTION_NAME }}
+
       - name: Get SSM Parameters
         id: get-ssm
         uses: ./.github/actions/get-ssm-parameters
