@@ -10,6 +10,7 @@ env:
   GOARCH: amd64
   CGO_ENABLED: 0
   FUNCTION_NAME: aws-budget-sentinel
+  SSM_PARAM_PATH: /budget-sentinel/prod
 
 jobs:
   build:
@@ -85,7 +86,19 @@ jobs:
           aws lambda update-function-code \
             --function-name ${{ env.FUNCTION_NAME }} \
             --zip-file fileb://lambda-artifact/lambda-deployment.zip
-            
+
+      - name: Get SSM Parameters
+        uses: ./.github/actions/get-ssm-parameters
+        with:
+          ssm_param_path: ${{ env.SSM_PARAM_PATH }}
+
+      - name: Update Lambda environment variables
+        if: steps.get-ssm.outputs.env_vars != ''
+        run: |
+          aws lambda update-function-configuration \
+            --function-name ${{ env.FUNCTION_NAME }} \
+            --environment "Variables={${{ steps.get-ssm.outputs.env_vars }}}"
+
       - name: Wait for Lambda update
         run: |
           aws lambda wait function-updated \
