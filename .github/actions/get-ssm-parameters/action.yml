@@ -26,6 +26,8 @@ runs:
         while read -r name value; do
           if [[ -n "$name" && -n "$value" ]]; then
             var_name=$(echo "$name" | awk -F'/' '{print $NF}') # Extract the last part of the parameter name
+            # Mask sensitive values in logs
+            echo "::add-mask::$value"
             echo "Found parameter: $var_name"
             if [[ -z "$env_vars" ]]; then
               env_vars="$var_name=$value"
