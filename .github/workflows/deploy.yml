@@ -102,11 +102,9 @@ jobs:
       - name: Update Lambda environment variables
         if: steps.get-ssm.outputs.env_vars != ''
         run: |
-          ENV_VARS='${{ steps.get-ssm.outputs.env_vars }}'
-          echo "::add-mask::${ENV_VARS}"
           aws lambda update-function-configuration \
             --function-name ${{ env.FUNCTION_NAME }} \
-            --environment "Variables={${ENV_VARS}}"
+            --environment "Variables={${{ steps.get-ssm.outputs.env_vars }}}"
 
       - name: Wait for Lambda update
         run: |
