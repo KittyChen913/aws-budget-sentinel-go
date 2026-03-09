@@ -22,14 +22,18 @@ runs:
         
         # Build the environment variables string
         env_vars=""
+        param_count=0
         while read -r name value; do
           if [[ -n "$name" && -n "$value" ]]; then
             var_name=$(echo "$name" | awk -F'/' '{print $NF}') # Extract the last part of the parameter name
+            # Mask sensitive values in logs
+            echo "::add-mask::$value"
             if [[ -z "$env_vars" ]]; then
               env_vars="$var_name=$value"
             else
               env_vars="$env_vars,$var_name=$value"
             fi
+            ((param_count++))
           fi
         done <<< "$params"
         
@@ -38,7 +42,7 @@ runs:
         
         # Debug output
         if [[ -n "$env_vars" ]]; then
-          echo "✓ Successfully retrieved SSM parameters"
+          echo "✓ Successfully retrieved $param_count SSM parameters"
         else
           echo "⚠ No SSM parameters found"
         fi
