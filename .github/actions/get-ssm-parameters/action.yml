@@ -32,7 +32,7 @@ runs:
             else
               env_vars="$env_vars,$var_name=$value"
             fi
-            ((param_count++))
+            param_count=$((param_count + 1))
           fi
         done <<< "$params"
         
