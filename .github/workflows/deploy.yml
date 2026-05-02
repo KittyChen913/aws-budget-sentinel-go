@@ -14,7 +14,6 @@ env:
   SSM_PARAM_PATH: /budget-sentinel/prod
   GO_VERSION: '1.24.1'
   TERRAFORM_VERSION: '1.10.0'
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -24,10 +23,10 @@ jobs:
       
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
           go-version: ${{ env.GO_VERSION }}
           
@@ -40,7 +39,7 @@ jobs:
           zip lambda-deployment.zip bootstrap
           
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: lambda-deployment
           path: lambda-deployment.zip
@@ -54,10 +53,10 @@ jobs:
       
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: lambda-deployment
           path: ./lambda-artifact
@@ -68,7 +67,7 @@ jobs:
           aws-account-id: ${{ secrets.AWS_ACCOUNT_ID }}
           
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           
@@ -130,7 +129,7 @@ jobs:
       
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure AWS credentials via OIDC
         uses: ./.github/actions/configure-aws
